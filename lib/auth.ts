@@ -53,8 +53,17 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async redirect({ url, baseUrl }) {
-      if (url.startsWith(baseUrl)) return "/";
-      return "/dashboard";
+      return url.startsWith(baseUrl) ? "/dashboard" : baseUrl;
+    },
+    async signIn({ user, account, profile }) {
+      const dbUser = await prisma.student.findFirst({
+        where: { email_address: user.email },
+      });
+      if (dbUser) {
+        return true;
+      } else {
+        return false;
+      }
     },
   },
   providers: [
@@ -73,8 +82,8 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials, req) {
-        console.log(credentials, 'credentials');
-        
+        // console.log(credentials, "credentials");
+
         // Add logic here to look up the user from the credentials supplied
         const user = { id: "1", name: "J Smith", email: "jsmith@example.com" };
 
