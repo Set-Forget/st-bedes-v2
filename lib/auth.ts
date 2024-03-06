@@ -78,25 +78,31 @@ export const authOptions: NextAuthOptions = {
       // e.g. domain, username, password, 2FA token, etc.
       // You can pass any HTML attribute to the <input> tag through the object.
       credentials: {
-        username: { label: "Username", type: "text", placeholder: "jsmith" },
+        email: { label: "Email", type: "text", placeholder: "Email" },
         password: { label: "Password", type: "password" },
       },
+
+      // MUST REDO TOMORROW
       async authorize(credentials, req) {
-        // console.log(credentials, "credentials");
 
-        // Add logic here to look up the user from the credentials supplied
-        const user = { id: "1", name: "J Smith", email: "jsmith@example.com" };
+        if (credentials) {
+          // Find the user in the database
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email },
+          });
+          
+          if (user) {
 
-        if (user) {
-          // Any object returned will be saved in `user` property of the JWT
-          return user;
-        } else {
-          // If you return null then an error will be displayed advising the user to check their details.
-          return null;
-
-          // You can also Reject this callback with an Error thus the user will be sent to the error page with the error message as a query parameter
+            return {
+              id: user.id,
+              name: user.name,
+              email: user.email,
+            };
+          }
         }
-      },
+        return null;
+      }
+      
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
