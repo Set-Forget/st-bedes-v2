@@ -10,6 +10,8 @@ const DashboardPage = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
+  console.log(session, "session");
+  
 
   useEffect(() => {
     if (status !== "loading") {

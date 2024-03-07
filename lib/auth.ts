@@ -45,13 +45,18 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, account }) {
       if (account && user) {
         token.accessToken = account.access_token;
+        token.user = { ...user };
       }
       return token;
     },
     async session({ session, token }) {
-      session.accessToken = String(token.accessToken);
+      session.accessToken;
+      if (token.user) {
+        session.user = token.user;
+      }
       return session;
     },
+
     async redirect({ url, baseUrl }) {
       return url.startsWith(baseUrl) ? "/dashboard" : baseUrl;
     },
@@ -79,27 +84,32 @@ export const authOptions: NextAuthOptions = {
       },
 
       async authorize(credentials, req) {
-
         if (credentials) {
           // Find the user in the database
           const student = await prisma.student.findFirst({
-            where: { email_address: credentials.email, password: credentials.password}
+            where: {
+              email_address: credentials.email,
+              password: credentials.password,
+            },
           });
 
           const parent = await prisma.parent.findFirst({
-            where: { email_address: credentials.email, password: credentials.password}
-          })
-          
+            where: {
+              email_address: credentials.email,
+              password: credentials.password,
+            },
+          });
+
           if (student) {
             return {
               id: student.student_id.toString(),
-              ...student
+              ...student,
             };
           } else if (parent) {
             return {
               id: parent.parent_id.toString(),
-              ...parent
-            }
+              ...parent,
+            };
           }
         }
         return null;
