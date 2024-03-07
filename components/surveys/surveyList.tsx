@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -11,81 +11,118 @@ import {
 } from "@/components/ui/table";
 import { ArrowUpRightFromSquare } from "lucide-react";
 import Link from "next/link";
+import Spinner from "../ui/spinner";
+import getSurveys from "@/app/api/surveys/all";
 
 const invoices = [
   {
     invoice: "Academic",
-    paymentStatus: "", // empty string for unpaid
-    totalAmount: "Mathematics", // random subject
-    paymentMethod: "Credit Card",
-  },
-  {
-    invoice: "School",
-    paymentStatus: "Mrs. Smith", // random teacher name
-    totalAmount: "", // empty string for no amount
-    paymentMethod: "PayPal",
-  },
-  {
-    invoice: "Academic",
-    paymentStatus: "", // empty string for unpaid
-    totalAmount: "Science", // random subject
-    paymentMethod: "Bank Transfer",
-  },
-  {
-    invoice: "School",
-    paymentStatus: "Mr. Johnson", // random teacher name
-    totalAmount: "History", // random subject
-    paymentMethod: "Credit Card",
-  },
-  {
-    invoice: "Academic",
-    paymentStatus: "Mrs. Brown", // random teacher name
-    totalAmount: "English", // random subject
-    paymentMethod: "PayPal",
-  },
-  {
-    invoice: "School",
-    paymentStatus: "", // empty string for unpaid
-    totalAmount: "Geography", // random subject
-    paymentMethod: "Bank Transfer",
-  },
-  {
-    invoice: "Academic",
-    paymentStatus: "Mr. Davis", // random teacher name
-    totalAmount: "Physical Education", // random subject
+    paymentStatus: "",
+    totalAmount: "Mathematics",
     paymentMethod: "Credit Card",
   },
 ];
 
-const SurveyList = () => {
+interface SurveyData {
+  academic: any;
+  school: any;
+}
+
+const SurveyList = ({ userId }: { userId: any }) => {
+  const [surveys, setSurveys] = useState<SurveyData | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const academics = surveys?.academic.student_has_survey_teacher;
+  const school = surveys?.school;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const data = await getSurveys(userId);
+        setSurveys(data);
+        setLoading(false);
+        console.log(data);
+      } catch (error) {
+        setLoading(false);
+        setError("Error fetching surveys");
+        console.error("Error fetching surveys:", error);
+      }
+    };
+    fetchData();
+  }, [userId]);
+
   return (
     <div className="mt-16">
-      <Table>
-        <TableCaption>Academic surveys</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">Section</TableHead>
-            <TableHead>Teacher</TableHead>
-            <TableHead>Subject</TableHead>
-            <TableHead className="text-right">Answer</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {invoices.map((invoice, idx) => (
-            <TableRow key={idx}>
-              <TableCell className="font-medium">{invoice.invoice}</TableCell>
-              <TableCell>{invoice.paymentStatus}</TableCell>
-              <TableCell>{invoice.totalAmount}</TableCell>
+      {loading ? (
+        <Spinner className="animate-spin" />
+      ) : (
+        <Table>
+          <TableCaption>Academic surveys</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">Teacher</TableHead>
+              <TableHead>Subject</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Answer</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow className="border-b border-zinc-400">
+              <TableCell className="font-medium min-w-56">-</TableCell>
+              <TableCell>School</TableCell>
+              <TableCell>
+                {true ? (
+                  <span className="t text-zinc-400">Completed</span>
+                ) : (
+                  <span className="text-amber-500">Pending</span>
+                )}
+              </TableCell>
               <TableCell className="flex justify-end items-center">
-                <Link href="/dashboard/dynamicsurveypage" className="mr-3">
-                  <ArrowUpRightFromSquare className="stroke-zinc-900" />
-                </Link>
+                {/* must change */}
+                {true ? (
+                  <button disabled className="mr-3">
+                    <ArrowUpRightFromSquare className="stroke-zinc-400 cursor-not-allowed" />
+                  </button>
+                ) : (
+                  <Link href="/dashboard/dynamicsurveypage" className="mr-3">
+                    <ArrowUpRightFromSquare className="stroke-zinc-900" />
+                  </Link>
+                )}
               </TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-        <TableFooter></TableFooter>
-      </Table>
+            {academics?.map((item: any, idx: number) => (
+              <TableRow key={idx}>
+                <TableCell className="font-medium min-w-56">
+                  {item.survey_teacher.teacher.full_name}
+                </TableCell>
+                <TableCell>
+                  {item.survey_teacher.set.subject.subject_name}
+                </TableCell>
+                <TableCell>
+                  {item.is_answered ? (
+                    <span>Completed</span>
+                  ) : (
+                    <span className="text-amber-500">Pending</span>
+                  )}
+                </TableCell>
+                <TableCell className="flex justify-end items-center">
+                  {item.is_answered ? (
+                    <button disabled className="mr-3">
+                      <ArrowUpRightFromSquare className="stroke-zinc-400 cursor-not-allowed" />
+                    </button>
+                  ) : (
+                    <Link href="/dashboard/dynamicsurveypage" className="mr-3">
+                      <ArrowUpRightFromSquare className="stroke-zinc-900" />
+                    </Link>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+          <TableFooter></TableFooter>
+        </Table>
+      )}
     </div>
   );
 };

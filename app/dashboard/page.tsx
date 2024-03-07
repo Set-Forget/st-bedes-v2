@@ -11,7 +11,6 @@ const DashboardPage = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   console.log(session, "session");
-  
 
   useEffect(() => {
     if (status !== "loading") {
@@ -26,7 +25,7 @@ const DashboardPage = () => {
   if (isLoading) {
     return (
       <div className="w-full min-h-screen mesh2 flex justify-center items-center">
-        <Spinner className="" />
+        <Spinner className="animate-spin" />
       </div>
     );
   }
@@ -35,10 +34,10 @@ const DashboardPage = () => {
     <div className="w-full min-h-screen mesh2 text-zinc-900 flex justify-center items-center">
       <Container className="w-full flex flex-col justify-center">
         <div className="flex space-x-2 text-3xl">
-          <p>Welcome back, </p> <p className="capitalize font-black">{session?.user?.name}</p>
+          <p>Welcome back, </p> <p className="capitalize font-black">{session?.user?.name || session?.user?.fullname}</p>
         </div>
         <p className="text-2xl text-zinc-600">Select a survey to get started</p>
-        <SurveyList/>
+        <SurveyList userId={session?.user?.student_id}/>
       </Container>
     </div>
   );

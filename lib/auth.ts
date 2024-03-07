@@ -46,6 +46,9 @@ export const authOptions: NextAuthOptions = {
       if (account && user) {
         token.accessToken = account.access_token;
         token.user = { ...user };
+        token.email = user.email;
+        token.name = user.name;
+        token.sub = user.id;
       }
       return token;
     },
