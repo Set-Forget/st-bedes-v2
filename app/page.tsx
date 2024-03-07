@@ -50,7 +50,7 @@ export default function Home() {
         animate="visible"
         className="absolute bottom-0 w-full"
       >
-        <Image src={stBedes} alt="" className=" w-full" />
+        <Image src={stBedes} alt="" className="w-full opacity-30" />
       </motion.div>
     </main>
   );
