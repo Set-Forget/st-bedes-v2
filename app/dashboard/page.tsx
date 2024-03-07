@@ -34,10 +34,13 @@ const DashboardPage = () => {
     <div className="w-full min-h-screen mesh2 text-zinc-900 flex justify-center items-center">
       <Container className="w-full flex flex-col justify-center">
         <div className="flex space-x-2 text-3xl">
-          <p>Welcome back, </p> <p className="capitalize font-black">{session?.user?.name || session?.user?.fullname}</p>
+          <p>Welcome back, </p>{" "}
+          <p className="capitalize font-black">
+            {session?.user?.name || (session?.user as any).fullname}
+          </p>
         </div>
         <p className="text-2xl text-zinc-600">Select a survey to get started</p>
-        <SurveyList userId={session?.user?.student_id}/>
+        <SurveyList userId={(session?.user as any).student_id} />
       </Container>
     </div>
   );

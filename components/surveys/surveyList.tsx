@@ -13,27 +13,17 @@ import { ArrowUpRightFromSquare } from "lucide-react";
 import Link from "next/link";
 import Spinner from "../ui/spinner";
 import getSurveys from "@/app/api/surveys/all";
-
-const invoices = [
-  {
-    invoice: "Academic",
-    paymentStatus: "",
-    totalAmount: "Mathematics",
-    paymentMethod: "Credit Card",
-  },
-];
-
-interface SurveyData {
-  academic: any;
-  school: any;
-}
+import { useSurvey } from "./surveyContext";
 
 const SurveyList = ({ userId }: { userId: any }) => {
-  const [surveys, setSurveys] = useState<SurveyData | null>(null);
+  const {surveys, setSurveys} = useSurvey()
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
   const academics = surveys?.academic.student_has_survey_teacher;
   const school = surveys?.school;
+  console.log(academics, "academics");
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,7 +40,7 @@ const SurveyList = ({ userId }: { userId: any }) => {
       }
     };
     fetchData();
-  }, [userId]);
+  }, [userId, setSurveys]);
 
   return (
     <div className="mt-16">
@@ -112,7 +102,7 @@ const SurveyList = ({ userId }: { userId: any }) => {
                       <ArrowUpRightFromSquare className="stroke-zinc-400 cursor-not-allowed" />
                     </button>
                   ) : (
-                    <Link href="/dashboard/dynamicsurveypage" className="mr-3">
+                    <Link href={`/dashboard/${item.survey_teacher.survey_teacher_id}`} className="mr-3">
                       <ArrowUpRightFromSquare className="stroke-zinc-900" />
                     </Link>
                   )}
