@@ -73,36 +73,37 @@ export const authOptions: NextAuthOptions = {
     }),
     CredentialsProvider({
       name: "Credentials",
-      // `credentials` is used to generate a form on the sign in page.
-      // You can specify which fields should be submitted, by adding keys to the `credentials` object.
-      // e.g. domain, username, password, 2FA token, etc.
-      // You can pass any HTML attribute to the <input> tag through the object.
       credentials: {
         email: { label: "Email", type: "text", placeholder: "Email" },
         password: { label: "Password", type: "password" },
       },
 
-      // MUST REDO TOMORROW
       async authorize(credentials, req) {
 
         if (credentials) {
           // Find the user in the database
-          const user = await prisma.user.findUnique({
-            where: { email: credentials.email },
+          const student = await prisma.student.findFirst({
+            where: { email_address: credentials.email, password: credentials.password}
           });
-          
-          if (user) {
 
+          const parent = await prisma.parent.findFirst({
+            where: { email_address: credentials.email, password: credentials.password}
+          })
+          
+          if (student) {
             return {
-              id: user.id,
-              name: user.name,
-              email: user.email,
+              id: student.student_id.toString(),
+              ...student
             };
+          } else if (parent) {
+            return {
+              id: parent.parent_id.toString(),
+              ...parent
+            }
           }
         }
         return null;
-      }
-      
+      },
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
