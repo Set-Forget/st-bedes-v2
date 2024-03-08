@@ -14,16 +14,18 @@ import Link from "next/link";
 import Spinner from "../ui/spinner";
 import getSurveys from "@/app/api/surveys/all";
 import { useSurvey } from "./surveyContext";
+import { useRouter } from "next/navigation";
 
 const SurveyList = ({ userId }: { userId: any }) => {
+  const router = useRouter()
   const {surveys, setSurveys} = useSurvey()
+  const {submitId, setSubmitId} = useSurvey()
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const academics = surveys?.academic.student_has_survey_teacher;
   const school = surveys?.school;
   console.log(academics, "academics");
-  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,6 +43,11 @@ const SurveyList = ({ userId }: { userId: any }) => {
     };
     fetchData();
   }, [userId, setSurveys]);
+
+  const handleRedirect = (item : any) => {
+    setSubmitId(item.id);
+    router.push(`/dashboard/${item.survey_teacher.survey_teacher_id}`);
+  }
 
   return (
     <div className="mt-16">
@@ -63,19 +70,19 @@ const SurveyList = ({ userId }: { userId: any }) => {
               <TableCell>School</TableCell>
               <TableCell>
                 {true ? (
-                  <span className="t text-zinc-400">Completed</span>
+                  <span className="text-zinc-400">Completed</span>
                 ) : (
                   <span className="text-amber-500">Pending</span>
                 )}
               </TableCell>
               <TableCell className="flex justify-end items-center">
                 {/* must change */}
-                {true ? (
+                {!true ? (
                   <button disabled className="mr-3">
                     <ArrowUpRightFromSquare className="stroke-zinc-400 cursor-not-allowed" />
                   </button>
                 ) : (
-                  <Link href="/dashboard/dynamicsurveypage" className="mr-3">
+                  <Link href='/dashboard/school' className="mr-3">
                     <ArrowUpRightFromSquare className="stroke-zinc-900" />
                   </Link>
                 )}
@@ -91,7 +98,7 @@ const SurveyList = ({ userId }: { userId: any }) => {
                 </TableCell>
                 <TableCell>
                   {item.is_answered ? (
-                    <span>Completed</span>
+                    <span className="text-zinc-400">Completed</span>
                   ) : (
                     <span className="text-amber-500">Pending</span>
                   )}
@@ -102,9 +109,9 @@ const SurveyList = ({ userId }: { userId: any }) => {
                       <ArrowUpRightFromSquare className="stroke-zinc-400 cursor-not-allowed" />
                     </button>
                   ) : (
-                    <Link href={`/dashboard/${item.survey_teacher.survey_teacher_id}`} className="mr-3">
+                    <a onClick={() => handleRedirect(item)} className="mr-3 cursor-pointer">
                       <ArrowUpRightFromSquare className="stroke-zinc-900" />
-                    </Link>
+                    </a>
                   )}
                 </TableCell>
               </TableRow>

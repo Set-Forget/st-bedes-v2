@@ -9,15 +9,18 @@ interface SurveyData {
 interface SurveyContextType {
   surveys: SurveyData | null;
   setSurveys: React.Dispatch<React.SetStateAction<SurveyData | null>>;
+  submitId: number | null; 
+  setSubmitId: React.Dispatch<React.SetStateAction<number | null>>; 
 }
 
 export const SurveyStateContext = createContext<SurveyContextType | null>(null);
 
 const SurveyContext = ({ children }: { children: React.ReactNode }) => {
   const [surveys, setSurveys] = useState<SurveyData | null>(null);
+  const [submitId, setSubmitId] = useState<number | null>(null);
 
   return (
-    <SurveyStateContext.Provider value={{ surveys, setSurveys }}>
+    <SurveyStateContext.Provider value={{ surveys, setSurveys, submitId, setSubmitId }}>
       {children}
     </SurveyStateContext.Provider>
   );
