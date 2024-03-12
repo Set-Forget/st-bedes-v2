@@ -5,23 +5,25 @@ import { useParams, useRouter } from "next/navigation";
 import getSpecificSurvey, {
   getSchoolSurvey,
   postAcademicSurveyAnswers,
-  postParentSurveyAnswers,
+  postSchoolSurveyAnswers
 } from "@/app/api/surveys/specific";
 import Spinner from "@/components/ui/spinner";
 import { useSession } from "next-auth/react";
 import { useSurvey } from "@/components/surveys/surveyContext";
+import TeacherSelector from "@/components/surveys/teacherSelector";
 
 interface QuestionOption {
   section: string;
-  title: string;
+  title: string | null;
   content: string;
   question_type: {
-    options: string;
-    type: string;
+    options: string | null;
+    type: string | null;
   };
 }
 
 interface SurveyQuestion {
+  id: number;
   survey_teacher_question_id: number;
   question: QuestionOption;
 }
@@ -29,16 +31,25 @@ interface SurveyQuestion {
 const SurveyPage = () => {
   const [survey, setSurvey] = useState<SurveyQuestion[]>([]);
   const { submitId, setSubmitId } = useSurvey();
+  const { schoolId, setSchoolId } = useSurvey()
   const [loading, setLoading] = useState(false);
   const [selections, setSelections] = useState<{ [key: number]: string }>({});
   const [error, setError] = useState("");
   const path = useParams();
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
   useEffect(() => {
-    console.log(submitId, "submitId");
+    if (status !== "loading") {
+      if (!session) {
+        router.push("/login");
+      } else {
+        setLoading(false);
+      }
+    }
+  }, [session, status, router]);
 
+  useEffect(() => {
     if (path.survey_id === "school") {
       console.log("school survey fetch");
       const fetchSchoolSurvey = async () => {
@@ -73,56 +84,86 @@ const SurveyPage = () => {
     }
   }, [path.survey_id]);
 
+  const handleInput = (key: string | number, value: string) => {
+    console.log(`Input Changed - Question ID: ${key}, Value: ${value}`); // Log the change
+    setSelections((prevSelections) => ({
+      ...prevSelections,
+      [key]: value,
+    }));
+  };
+
   const handleSelection = (questionId: number, option: string) => {
+    console.log(`Selection Made - Question ID: ${questionId}, Selected Option: ${option}`); // Log the selection
     setSelections((prevSelections) => ({
       ...prevSelections,
       [questionId]: option,
     }));
   };
 
-  const renderOptions = (questionId: number, options: string) => {
-    const optionsArray = JSON.parse(options);
-    return optionsArray.map((option: string, index: number) => (
-      <button
-        key={index}
-        type="button"
-        className={`rounded-md px-4 ${
-          selections[questionId] === option
+  const renderOptions = (questionId: string | number, options: string | null, question_type: string) => {
+    if (question_type === "select" && options) {
+      const optionsArray = JSON.parse(options);
+      return optionsArray.map((option: string, index: number) => (
+        <button
+          key={index}
+          type="button"
+          className={`rounded-md px-4 ${selections[questionId as number] === option
             ? "bg-zinc-900 text-zinc-100"
-            : "border border-zinc-900 text-zinc-400"
-        }`}
-        onClick={() => handleSelection(questionId, option)}
-      >
-        {option}
-      </button>
-    ));
+            : "border border-zinc-900 text-zinc-900"
+            }`}
+          onClick={() => handleInput(questionId, option)}
+        >
+          {option}
+        </button>
+      ));
+    } else if (question_type === "text") {
+      return (
+        <input
+          placeholder="Answer"
+          type="text"
+          className="bg-transparent border border-transparent px-0.5 border-b-zinc-900"
+          value={selections[questionId as number] || ''}
+          onChange={(e) => handleInput(questionId, e.target.value)}
+        />
+      );
+    } else {
+      return <TeacherSelector onSelect={(value: any) => handleSelection(questionId as number, value)} />;
+    }
   };
-
-  useEffect(() => {
-    console.log("Current selections:", selections);
-  }, [selections]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const studentId = (session?.user as any).student_id;
-    const surveyResponses = Object.entries(selections).map(
-      ([questionId, answer]) => ({
-        student_id: studentId,
-        survey_teacher_question_id: +questionId,
-        answer: answer,
-      })
-    );
 
-    const payload = {
-      student_has_survey_teacher: submitId,
-      CreateSurveyTeacherAnswerDto: surveyResponses,
-    };
+    const surveyResponses = Object.entries(selections).map(([questionId, answer]) => ({
+      student_id: studentId,
+      survey_question_id: parseInt(questionId),
+      answer: answer,
+    }));
 
-    console.log(payload, 'payload');
-    
-  
     try {
-      await postAcademicSurveyAnswers(payload);
+      if (path.survey_id === "school") {
+        const schoolPayload = {
+          student_has_survey_id: schoolId,
+          createSurveyAnswerDto: surveyResponses.map(({ student_id, survey_question_id, answer }) => ({
+            student_id,
+            survey_question_id,
+            answer,
+          }))
+        };
+        await postSchoolSurveyAnswers(schoolPayload);
+      } else {
+        const academicPayload = {
+          student_has_survey_teacher: submitId,
+          CreateSurveyTeacherAnswerDto: surveyResponses.map(({ student_id, survey_question_id, answer }) => ({
+            student_id,
+            survey_teacher_question_id: survey_question_id,
+            answer,
+          }))
+        };
+        await postAcademicSurveyAnswers(academicPayload);
+      }
+
       console.log("Survey responses submitted successfully");
       router.push("/dashboard");
     } catch (error) {
@@ -131,16 +172,16 @@ const SurveyPage = () => {
   };
 
   return (
-    <div className="w-full min-h-screen mesh1 pt-40 2xl:pt-0 text-zinc-900 flex justify-center items-center">
+    <div className="w-full min-h-screen mesh1 pt-40 2xl:pt-32 text-sm text-zinc-900 flex justify-center items-center">
       {loading ? (
         <Spinner className="animate-spin" />
       ) : (
         <Container className="w-full py-5 flex flex-col justify-center">
           {survey.length > 0 && (
             <form onSubmit={handleSubmit} className="flex flex-col space-y-12">
-              {survey.map(({ survey_teacher_question_id, question }, idx) => (
+              {survey.map(({ survey_teacher_question_id, question, id }, idx) => (
                 <div
-                  key={survey_teacher_question_id}
+                  key={survey_teacher_question_id !== undefined ? survey_teacher_question_id : id}
                   className="mb-4 border-b border-zinc-200 pb-4"
                 >
                   <div className="flex justify-between items-center mb-4 w-full">
@@ -148,13 +189,14 @@ const SurveyPage = () => {
                       {question.content}
                     </p>
                     <p className="font-bold border border-zinc-900 px-4 rounded-md">
-                      {question.title}
+                      {question.title} {id}
                     </p>
                   </div>
                   <div className="flex space-x-2">
                     {renderOptions(
-                      survey_teacher_question_id,
-                      question.question_type.options
+                      survey_teacher_question_id !== undefined ? survey_teacher_question_id : id,
+                      question.question_type.options!,
+                      question.question_type.type!
                     )}
                   </div>
                 </div>

@@ -31,7 +31,7 @@ const DashboardPage = () => {
   }
 
   return (
-    <div className="w-full min-h-screen mesh2 pt-40 2xl:pt-0 text-zinc-900 flex justify-center items-center">
+    <div className="w-full min-h-screen mesh2 pt-40 2xl:pt-32 text-zinc-900 flex justify-center items-center">
       <Container className="w-full flex flex-col justify-center">
         <div className="flex space-x-2 text-3xl">
           <p>Welcome back, </p>{" "}

@@ -14,7 +14,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="fixed top-0 py-8 flex w-full">
+    <div className="fixed top-0 py-8 flex w-full bg-gradient-to-b from-zinc-100 to-transparent">
       <Container className="flex w-full justify-between items-center">
         <Link href="/" className="font-bold text-xl">
           St Bede&apos;s
@@ -47,7 +47,7 @@ const Navbar = () => {
                     className="w-10 h-10 rounded-full"
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-full ring-2 ring-zinc-200 capitalize text-zinc-400 font-black flex justify-center items-center">
+                  <div className="w-10 h-10 rounded-full ring-2 ring-zinc-200 bg-zinc-100 capitalize text-zinc-400 font-black flex justify-center items-center">
                     @
                   </div>
                 )}

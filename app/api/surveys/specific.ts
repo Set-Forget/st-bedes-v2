@@ -10,7 +10,7 @@ export default async function getSpecificSurvey(id: string | string[]) {
 
 export async function getSchoolSurvey() {
   const url = process.env.NEXT_PUBLIC_BACK_URL as string;
-  const schoolSurveyEndpoint = `${url}/survey/get-survey-student`;
+  const schoolSurveyEndpoint = `${url}/survey/get-school-question`;
 
   const survey = await basicFetch<any>(schoolSurveyEndpoint);
   return survey;
@@ -48,17 +48,39 @@ export async function postAcademicSurveyAnswers(payload: {
   }
 }
 
-export async function postSchoolSurveyAnswers(
-  studentId: string | number,
-  surveyQuestionIds: string[] | number[],
-  answers: string[]
-) {
-  // post body: [{
-  //   studentId: num,
-  //   surveyQuestionId: num,
-  //   answer: string
-  // },]
+export async function postSchoolSurveyAnswers(payload: {
+  student_has_survey_id: number | null,
+  createSurveyAnswerDto: {
+    student_id: number,
+    survey_question_id: number,
+    answer: string,
+  }[]
+}) {
+  const url = process.env.NEXT_PUBLIC_BACK_URL as string;
+  const schoolEndpoint = `${url}/survey/add-answer`;
+
+  const response = await fetch(schoolEndpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      student_has_survey_id: payload.student_has_survey_id,
+      createSurveyAnswerDto: payload.createSurveyAnswerDto,
+    }),
+  });
+
+  if (!response.ok) {
+    const body = ({
+      student_has_survey_id: payload.student_has_survey_id,
+      createSurveyAnswerDto: payload.createSurveyAnswerDto,
+    });
+    console.log(body);
+
+    throw new Error("Failed to submit survey responses");
+  }
 }
+
 export async function postParentSurveyAnswers(
   studentId: string | number,
   ParentSurveyQuestionIds: string[] | number[],

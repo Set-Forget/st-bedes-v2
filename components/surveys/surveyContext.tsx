@@ -2,15 +2,17 @@
 import React, { createContext, useState, useContext } from "react";
 
 interface SurveyData {
-  academic: any; 
-  school: any; 
+  academic: any;
+  school: any;
 }
 
 interface SurveyContextType {
   surveys: SurveyData | null;
   setSurveys: React.Dispatch<React.SetStateAction<SurveyData | null>>;
-  submitId: number | null; 
-  setSubmitId: React.Dispatch<React.SetStateAction<number | null>>; 
+  submitId: number | null;
+  setSubmitId: React.Dispatch<React.SetStateAction<number | null>>;
+  schoolId: number | null;
+  setSchoolId: React.Dispatch<React.SetStateAction<number | null>>
 }
 
 export const SurveyStateContext = createContext<SurveyContextType | null>(null);
@@ -18,9 +20,10 @@ export const SurveyStateContext = createContext<SurveyContextType | null>(null);
 const SurveyContext = ({ children }: { children: React.ReactNode }) => {
   const [surveys, setSurveys] = useState<SurveyData | null>(null);
   const [submitId, setSubmitId] = useState<number | null>(null);
+  const [schoolId, setSchoolId] = useState<number | null>(null);
 
   return (
-    <SurveyStateContext.Provider value={{ surveys, setSurveys, submitId, setSubmitId }}>
+    <SurveyStateContext.Provider value={{ surveys, setSurveys, submitId, setSubmitId, schoolId, setSchoolId }}>
       {children}
     </SurveyStateContext.Provider>
   );

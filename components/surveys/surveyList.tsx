@@ -18,14 +18,17 @@ import { useRouter } from "next/navigation";
 
 const SurveyList = ({ userId }: { userId: any }) => {
   const router = useRouter()
-  const {surveys, setSurveys} = useSurvey()
-  const {submitId, setSubmitId} = useSurvey()
+  const { surveys, setSurveys } = useSurvey()
+  const { submitId, setSubmitId } = useSurvey()
+  const { schoolId, setSchoolId } = useSurvey()
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const academics = surveys?.academic.student_has_survey_teacher;
   const school = surveys?.school;
   console.log(academics, "academics");
+  console.log(school, 'school');
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,10 +47,19 @@ const SurveyList = ({ userId }: { userId: any }) => {
     fetchData();
   }, [userId, setSurveys]);
 
-  const handleRedirect = (item : any) => {
+  const handleRedirect = (item: any) => {
     setSubmitId(item.id);
     router.push(`/dashboard/${item.survey_teacher.survey_teacher_id}`);
   }
+
+  const handleSchoolRedirect = (school: any) => {
+    const firstSurvey = school.student_has_survey[0];
+    if (firstSurvey) {
+      setSchoolId(firstSurvey.id);
+      router.push(`/dashboard/school`);
+    }
+  }
+
 
   return (
     <div className="mt-16">
@@ -69,24 +81,25 @@ const SurveyList = ({ userId }: { userId: any }) => {
               <TableCell className="font-medium min-w-56">-</TableCell>
               <TableCell>School</TableCell>
               <TableCell>
-                {true ? (
+                {school && school.student_has_survey && school.student_has_survey.length > 0 && school.student_has_survey[0].is_answered ? (
                   <span className="text-zinc-400">Completed</span>
                 ) : (
                   <span className="text-amber-500">Pending</span>
                 )}
               </TableCell>
               <TableCell className="flex justify-end items-center">
-                {/* must change */}
-                {!true ? (
+                {/* Check if school and student_has_survey exist and it has at least one item */}
+                {school && school.student_has_survey && school.student_has_survey.length > 0 && school.student_has_survey[0].is_answered ? (
                   <button disabled className="mr-3">
                     <ArrowUpRightFromSquare className="stroke-zinc-400 cursor-not-allowed" />
                   </button>
                 ) : (
-                  <Link href='/dashboard/school' className="mr-3">
+                  <button onClick={() => school && handleSchoolRedirect(school)} className="mr-3">
                     <ArrowUpRightFromSquare className="stroke-zinc-900" />
-                  </Link>
+                  </button>
                 )}
               </TableCell>
+
             </TableRow>
             {academics?.map((item: any, idx: number) => (
               <TableRow key={idx}>
