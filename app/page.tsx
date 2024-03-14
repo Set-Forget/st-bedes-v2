@@ -4,7 +4,6 @@ import Image from "next/image";
 import stBedes from "@/public/st-bedes.svg";
 import { Manrope } from "next/font/google";
 import { motion } from "framer-motion";
-
 const manrope = Manrope({ weight: "variable", subsets: ["latin"] });
 
 export default function Home() {
@@ -31,7 +30,7 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center justify-center mesh2 overflow-y-hidden">
       <Container className="flex flex-col justify-items-center">
         <motion.div
-          className={`${manrope.className} text-3xl 2xl:text-5xl text-zinc-600`}
+          className={`${manrope.className} text-2xl 2xl:text-5xl text-zinc-600`}
           variants={container}
           initial="hidden"
           animate="visible"

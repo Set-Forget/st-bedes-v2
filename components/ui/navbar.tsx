@@ -14,7 +14,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="fixed top-0 py-8 flex w-full bg-gradient-to-b from-zinc-100 to-transparent">
+    <div className="fixed top-0 py-8 flex w-full bg-gradient-to-b from-zinc-100 to-transparent px-5">
       <Container className="flex w-full justify-between items-center">
         <Link href="/" className="font-bold text-xl">
           St Bede&apos;s

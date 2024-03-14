@@ -121,7 +121,7 @@ const SurveyPage = () => {
         <input
           placeholder="Answer"
           type="text"
-          className="bg-transparent border border-transparent px-0.5 border-b-zinc-900"
+          className="bg-transparent w-full md:w-56 border border-transparent px-0.5 border-b-zinc-900"
           value={selections[questionId as number] || ''}
           onChange={(e) => handleInput(questionId, e.target.value)}
         />
@@ -176,7 +176,7 @@ const SurveyPage = () => {
       {loading ? (
         <Spinner className="animate-spin" />
       ) : (
-        <Container className="w-full py-5 flex flex-col justify-center">
+        <Container className="w-full py-5 px-5 flex flex-col justify-center">
           {survey.length > 0 && (
             <form onSubmit={handleSubmit} className="flex flex-col space-y-12">
               {survey.map(({ survey_teacher_question_id, question, id }, idx) => (
@@ -184,15 +184,15 @@ const SurveyPage = () => {
                   key={survey_teacher_question_id !== undefined ? survey_teacher_question_id : id}
                   className="mb-4 border-b border-zinc-200 pb-4"
                 >
-                  <div className="flex justify-between items-center mb-4 w-full">
-                    <p className="text-lg font-medium  text-balance w-1/2">
+                  <div className="flex md:flex-row flex-col-reverse md:justify-between 2xl:items-center mb-4 w-full">
+                    <p className="2xl:text-lg font-medium text-balance 2xl:w-1/2">
                       {question.content}
                     </p>
-                    <p className="font-bold border border-zinc-900 px-4 rounded-md">
-                      {question.title} {id}
+                    <p className="font-bold border border-zinc-900 px-4 rounded-md mb-4 2xl:mb-0">
+                      {question.title}
                     </p>
                   </div>
-                  <div className="flex space-x-2">
+                  <div className="flex gap-2 flex-wrap">
                     {renderOptions(
                       survey_teacher_question_id !== undefined ? survey_teacher_question_id : id,
                       question.question_type.options!,

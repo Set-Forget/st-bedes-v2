@@ -30,7 +30,7 @@ const TeacherSelector = ({ onSelect }: { onSelect: any }) => {
 
     return (
         <Select required onValueChange={handleSelect}>
-            <SelectTrigger className="w-56">
+            <SelectTrigger className="md:w-56 w-full">
                 <SelectValue placeholder="Select a teacher" />
             </SelectTrigger>
             <SelectContent>
