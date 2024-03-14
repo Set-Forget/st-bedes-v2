@@ -34,6 +34,7 @@ const SurveyPage = () => {
   const { schoolId, setSchoolId } = useSurvey()
   const [loading, setLoading] = useState(false);
   const [selections, setSelections] = useState<{ [key: number]: string }>({});
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const [error, setError] = useState("");
   const path = useParams();
   const router = useRouter();
@@ -85,7 +86,7 @@ const SurveyPage = () => {
   }, [path.survey_id]);
 
   const handleInput = (key: string | number, value: string) => {
-    console.log(`Input Changed - Question ID: ${key}, Value: ${value}`); // Log the change
+    console.log(`Input Changed - Question ID: ${key}, Value: ${value}`); 
     setSelections((prevSelections) => ({
       ...prevSelections,
       [key]: value,
@@ -93,11 +94,36 @@ const SurveyPage = () => {
   };
 
   const handleSelection = (questionId: number, option: string) => {
-    console.log(`Selection Made - Question ID: ${questionId}, Selected Option: ${option}`); // Log the selection
+    console.log(`Selection Made - Question ID: ${questionId}, Selected Option: ${option}`); 
     setSelections((prevSelections) => ({
       ...prevSelections,
       [questionId]: option,
     }));
+  };
+
+  useEffect(() => {
+    const allSelected = survey.every((q) => {
+      if (q.question.question_type.type !== 'select') {
+        return true;
+      }
+
+      const key = q.survey_teacher_question_id ?? q.id;
+      return selections.hasOwnProperty(key);
+    });
+  
+    setIsSubmitDisabled(!allSelected);
+  }, [selections, survey]);
+
+  const checkIfAllRequiredSelected = () => {
+    const allSelected = survey.every(q => {
+      if (q.question.question_type.type !== 'select') {
+        return true;
+      }
+
+      return selections[q.survey_teacher_question_id] !== undefined;
+    });
+
+    setIsSubmitDisabled(!allSelected);
   };
 
   const renderOptions = (questionId: string | number, options: string | null, question_type: string) => {
@@ -203,7 +229,8 @@ const SurveyPage = () => {
               ))}
               <button
                 type="submit"
-                className="border text-zinc-100 bg-zinc-900 rounded-md px-4 py-1 self-center mt-8"
+                disabled={isSubmitDisabled}
+                className={`border rounded-md px-4 py-1 self-center mt-8 ${isSubmitDisabled ? "border border-zinc-900/50 text-zinc-500 cursor-not-allowed" : "text-zinc-100 bg-zinc-900"}`}
               >
                 Submit your answers
               </button>
