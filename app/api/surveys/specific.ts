@@ -30,6 +30,7 @@ export async function postAcademicSurveyAnswers(payload: {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "true",
     },
     body: JSON.stringify({
       student_has_survey_teacher: payload.student_has_survey_teacher,
@@ -63,6 +64,7 @@ export async function postSchoolSurveyAnswers(payload: {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "true",
     },
     body: JSON.stringify({
       student_has_survey_id: payload.student_has_survey_id,
