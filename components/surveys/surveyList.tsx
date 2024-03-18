@@ -70,6 +70,9 @@ const SurveyList = ({ userId }: { userId: any }) => {
     }
   }
 
+  console.log(filteredAcademics, 'filteredAcademics');
+  
+
 
   return (
     <div className="mt-16 min-h-[800px]">

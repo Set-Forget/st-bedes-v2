@@ -64,16 +64,26 @@ export const authOptions: NextAuthOptions = {
       return url.startsWith(baseUrl) ? "/dashboard" : baseUrl;
     },
     async signIn({ user, account, profile }) {
-      const dbUser = await prisma.student.findFirst({
-        where: { email_address: user.email },
-      });
-      if (dbUser) {
+      const backUrl = process.env.NEXT_PUBLIC_BACK_URL as string;
+      try {
+        const res = await fetch(`${backUrl}/auth/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email_address: user.email
+          })
+        });
+    
         return true;
-      } else {
+      } catch (error) {
+        console.error("Error during sign in:", error);
         return false;
       }
-    },
+    }
   },
+
   providers: [
     GoogleProvider({
       clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string,
@@ -88,35 +98,33 @@ export const authOptions: NextAuthOptions = {
 
       async authorize(credentials, req) {
         if (credentials) {
-          // Find the user in the database
-          const student = await prisma.student.findFirst({
-            where: {
-              email_address: credentials.email,
-              password: credentials.password,
-            },
-          });
-
-          const parent = await prisma.parent.findFirst({
-            where: {
-              email_address: credentials.email,
-              password: credentials.password,
-            },
-          });
-
-          if (student) {
-            return {
-              id: student.student_id.toString(),
-              ...student,
-            };
-          } else if (parent) {
-            return {
-              id: parent.parent_id.toString(),
-              ...parent,
-            };
+          const backUrl = process.env.NEXT_PUBLIC_BACK_URL as string;
+          try {
+            const response = await fetch(`${backUrl}/auth/login-student`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                email: credentials.email,
+                password: credentials.password,
+              }),
+            });
+  
+            if (response.ok) {
+              const user = await response.json(); 
+                return {
+                  id: user.student_id,
+                  ...user,
+                };
+            }
+          } catch (error) {
+            console.error('Error during user authorization:', error);
           }
         }
         return null;
-      },
+      }
+      
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
