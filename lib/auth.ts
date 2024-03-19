@@ -75,7 +75,8 @@ export const authOptions: NextAuthOptions = {
             email_address: user.email
           })
         });
-    
+        console.log(res, "credentials login response");
+        
         return true;
       } catch (error) {
         console.error("Error during sign in:", error);
@@ -97,6 +98,8 @@ export const authOptions: NextAuthOptions = {
       },
 
       async authorize(credentials, req) {
+        console.log(credentials, 'credentials in authorize');
+        
         if (credentials) {
           const backUrl = process.env.NEXT_PUBLIC_BACK_URL as string;
           try {
@@ -113,6 +116,8 @@ export const authOptions: NextAuthOptions = {
   
             if (response.ok) {
               const user = await response.json(); 
+              console.log(user, 'user response credentials');
+              
                 return {
                   id: user.student_id,
                   ...user,
