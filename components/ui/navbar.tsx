@@ -26,9 +26,10 @@ const Navbar = () => {
   }, [prevScrollPos, visible, handleScroll]);
 
   return (
-    <div className={`fixed top-0 py-6 flex bg-zinc-100 shadow w-full shadow-zinc-300/50 px-5 transition-all duration-700 ${visible ? "top-0" : "-top-full"} ease-in-out`} style={{
-      transitionTimingFunction: 'cubic-bezier(0.65, 0.05, 0.36, 1)'
-    }}>
+    <div style={{
+      transition: 'all 0.7s cubic-bezier(0.65, 0.05, 0.36, 1)'
+    }} className={`fixed top-0 py-3.5 flex bg-zinc-100 shadow w-full px-5 ${visible ? "top-0" : "-top-[100%]"
+      } transition-top duration-700`}>
       <Container className="flex w-full justify-between items-center">
         <Link href="/" className="font-bold text-xl">
           St Bede&apos;s
