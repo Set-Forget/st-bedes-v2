@@ -1,20 +1,35 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Container from "./container";
 import { useSession, signOut } from "next-auth/react";
-import Image from "next/image";
 
 const Navbar = () => {
   const { data: session, status } = useSession();
+  const [visible, setVisible] = useState(true);
+  const [prevScrollPos, setPrevScrollPos] = useState(0);
+
+  const handleScroll = () => {
+    const currentScrollPos = window.scrollY;
+    setVisible(prevScrollPos > currentScrollPos || currentScrollPos < 10);
+    setPrevScrollPos(currentScrollPos);
+  };
 
   const handleSignOut = async (e: any) => {
     e.preventDefault();
     await signOut({ callbackUrl: "/" });
   };
 
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [prevScrollPos, visible, handleScroll]);
+
   return (
-    <div className="fixed top-0 py-8 flex w-full bg-gradient-to-b from-zinc-100 to-transparent px-5">
+    <div style={{
+      transition: 'all 0.7s cubic-bezier(0.65, 0.05, 0.36, 1)'
+    }} className={`fixed top-0 py-3.5 flex bg-zinc-100 shadow w-full px-5 ${visible ? "top-0" : "-top-[100%]"
+      } transition-top duration-700`}>
       <Container className="flex w-full justify-between items-center">
         <Link href="/" className="font-bold text-xl">
           St Bede&apos;s
