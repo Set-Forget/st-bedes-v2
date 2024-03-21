@@ -40,7 +40,13 @@ const SurveyPage = () => {
   const router = useRouter();
   const { data: session, status } = useSession();
   let studentId: any;
-  if (session) studentId = (session?.user as any).student_id;
+
+  useEffect(() => {
+    if (session) {
+      studentId = (session.user as any).student_id;
+      // console.log(studentId, "student id survey page");
+    }
+  }, [session]);
 
   useEffect(() => {
     if (status !== "loading") {

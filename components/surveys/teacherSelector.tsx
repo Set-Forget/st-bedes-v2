@@ -1,3 +1,4 @@
+"use client"
 import { getStudentTeachers } from "@/app/api/surveys/teachers";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
@@ -16,7 +17,7 @@ const TeacherSelector = ({ onSelect }: { onSelect: any }) => {
     const [teachers, setTeachers] = useState<string[]>([])
     let studentId: any;
     if (session) studentId = (session?.user as any).student_id;
-
+    
     useEffect(() => {
         const fetchData = async () => {
             const data = await getStudentTeachers({ studentId })
