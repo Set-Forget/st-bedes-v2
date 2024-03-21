@@ -51,6 +51,18 @@ const SurveyPage = () => {
   }, [session, status, router]);
 
   useEffect(() => {
+    const storedSubmitId = localStorage.getItem('submitId');
+    const storedSchoolId = localStorage.getItem('schoolId');
+    console.log(storedSchoolId, storedSubmitId);
+    
+
+    if (storedSubmitId) setSubmitId(+storedSubmitId);
+    if (storedSchoolId) setSchoolId(+storedSchoolId);
+
+  }, [submitId, schoolId]);
+
+
+  useEffect(() => {
     if (path.survey_id === "school") {
       console.log("school survey fetch");
       const fetchSchoolSurvey = async () => {
@@ -86,7 +98,7 @@ const SurveyPage = () => {
   }, [path.survey_id]);
 
   const handleInput = (key: string | number, value: string) => {
-    console.log(`Input Changed - Question ID: ${key}, Value: ${value}`); 
+    console.log(`Input Changed - Question ID: ${key}, Value: ${value}`);
     setSelections((prevSelections) => ({
       ...prevSelections,
       [key]: value,
@@ -94,7 +106,7 @@ const SurveyPage = () => {
   };
 
   const handleSelection = (questionId: number, option: string) => {
-    console.log(`Selection Made - Question ID: ${questionId}, Selected Option: ${option}`); 
+    console.log(`Selection Made - Question ID: ${questionId}, Selected Option: ${option}`);
     setSelections((prevSelections) => ({
       ...prevSelections,
       [questionId]: option,
@@ -110,7 +122,7 @@ const SurveyPage = () => {
       const key = q.survey_teacher_question_id ?? q.id;
       return selections.hasOwnProperty(key);
     });
-  
+
     setIsSubmitDisabled(!allSelected);
   }, [selections, survey]);
 
@@ -169,7 +181,7 @@ const SurveyPage = () => {
 
     try {
       if (path.survey_id === "school") {
-        const schoolPayload = {
+        const schoolPayload: any = {
           student_has_survey_id: schoolId,
           createSurveyAnswerDto: surveyResponses.map(({ student_id, survey_question_id, answer }) => ({
             student_id,

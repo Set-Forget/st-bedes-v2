@@ -22,13 +22,14 @@ const Navbar = () => {
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
+    console.log(visible);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [prevScrollPos, visible, handleScroll]);
 
   return (
     <div style={{
       transition: 'all 0.7s cubic-bezier(0.65, 0.05, 0.36, 1)'
-    }} className={`fixed top-0 py-3.5 flex bg-zinc-100 shadow w-full px-5 ${visible ? "top-0" : "-top-[100%]"
+    }} className={`z-50 fixed top-0 py-3.5 flex bg-zinc-100 shadow w-full px-5 ${visible ? "opacity-100" : "opacity-0 pointer-events-none"
       } transition-top duration-700`}>
       <Container className="flex w-full justify-between items-center">
         <Link href="/" className="font-bold text-xl">

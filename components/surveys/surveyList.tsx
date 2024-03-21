@@ -33,10 +33,10 @@ const SurveyList = ({ userId }: { userId: any }) => {
 
   const filteredAcademics = academics?.filter((item: any) => {
     const matchesSearchQuery = item.survey_teacher.set.subject.subject_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                               item.survey_teacher.teacher.full_name.toLowerCase().includes(searchQuery.toLowerCase());
+      item.survey_teacher.teacher.full_name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' ||
-                          (statusFilter === 'pending' && !item.is_answered) ||
-                          (statusFilter === 'completed' && item.is_answered);
+      (statusFilter === 'pending' && !item.is_answered) ||
+      (statusFilter === 'completed' && item.is_answered);
     return matchesSearchQuery && matchesStatus;
   });
 
@@ -58,21 +58,22 @@ const SurveyList = ({ userId }: { userId: any }) => {
   }, [userId, setSurveys]);
 
   const handleRedirect = (item: any) => {
-    setSubmitId(item.id);
+    const id = item.id as number;
+    localStorage.setItem('submitId', JSON.stringify(id)); 
+    setSubmitId(id); 
     router.push(`/dashboard/${item.survey_teacher.survey_teacher_id}`);
   }
-
+  
   const handleSchoolRedirect = (school: any) => {
     const firstSurvey = school.student_has_survey[0];
+    console.log(firstSurvey, 'first survey');
+    
     if (firstSurvey) {
-      setSchoolId(firstSurvey.id);
+      localStorage.setItem('schoolId', JSON.stringify(firstSurvey.id));
+      setSchoolId(firstSurvey.id); 
       router.push(`/dashboard/school`);
     }
   }
-
-  console.log(filteredAcademics, 'filteredAcademics');
-  
-
 
   return (
     <div className="mt-16 min-h-[800px]">
