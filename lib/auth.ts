@@ -75,9 +75,10 @@ export const authOptions: NextAuthOptions = {
             email_address: user.email
           })
         });
-        console.log(res, "credentials login response");
-        
+
+        if (res.status === 404) return false;
         return true;
+        
       } catch (error) {
         console.error("Error during sign in:", error);
         return false;
@@ -99,7 +100,7 @@ export const authOptions: NextAuthOptions = {
 
       async authorize(credentials, req) {
         console.log(credentials, 'credentials in authorize');
-        
+
         if (credentials) {
           const backUrl = process.env.NEXT_PUBLIC_BACK_URL as string;
           try {
@@ -113,15 +114,15 @@ export const authOptions: NextAuthOptions = {
                 password: credentials.password,
               }),
             });
-  
+
             if (response.ok) {
-              const user = await response.json(); 
+              const user = await response.json();
               console.log(user, 'user response credentials');
-              
-                return {
-                  id: user.student_id,
-                  ...user,
-                };
+
+              return {
+                id: user.student_id,
+                ...user,
+              };
             }
           } catch (error) {
             console.error('Error during user authorization:', error);
@@ -129,7 +130,7 @@ export const authOptions: NextAuthOptions = {
         }
         return null;
       }
-      
+
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
