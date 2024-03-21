@@ -92,7 +92,11 @@ const SurveyList = ({ userId }: { userId: any }) => {
   return (
     <div className="mt-16 min-h-[800px]">
       {loading ? (
-        <Spinner className="animate-spin" />
+        <div className="w-full">
+          <div className="bg-zinc-100/50 flex justify-center items-center border border-zinc-100 backdrop-blur-md animate-pulse lg:h-[400px] h-[200px] w-full rounded-xl text-zinc-200">
+            <Spinner className={"text-black"} />
+          </div>
+        </div>
       ) : (
 
         <>
