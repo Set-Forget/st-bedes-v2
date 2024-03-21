@@ -59,21 +59,35 @@ const SurveyList = ({ userId }: { userId: any }) => {
 
   const handleRedirect = (item: any) => {
     const id = item.id as number;
-    localStorage.setItem('submitId', JSON.stringify(id)); 
-    setSubmitId(id); 
+    localStorage.setItem('submitId', JSON.stringify(id));
+    setSubmitId(id);
     router.push(`/dashboard/${item.survey_teacher.survey_teacher_id}`);
   }
-  
+
   const handleSchoolRedirect = (school: any) => {
     const firstSurvey = school.student_has_survey[0];
     console.log(firstSurvey, 'first survey');
-    
+
     if (firstSurvey) {
       localStorage.setItem('schoolId', JSON.stringify(firstSurvey.id));
-      setSchoolId(firstSurvey.id); 
+      setSchoolId(firstSurvey.id);
       router.push(`/dashboard/school`);
     }
   }
+
+  const schoolSurveyIncluded = () => {
+    const schoolSurveyMatch = school && school.student_has_survey && school.student_has_survey.length > 0;
+    const firstSurvey = schoolSurveyMatch ? school.student_has_survey[0] : null;
+
+    const matchesSearchQuery = !searchQuery || (schoolSurveyMatch && (
+      "school".includes(searchQuery.toLowerCase())
+    ));
+
+    const matchesStatus = !statusFilter || (statusFilter === 'all') || (statusFilter === 'pending' && !firstSurvey?.is_answered) || (statusFilter === 'completed' && firstSurvey?.is_answered);
+
+    return matchesSearchQuery && matchesStatus;
+  };
+
 
   return (
     <div className="mt-16 min-h-[800px]">
@@ -95,39 +109,40 @@ const SurveyList = ({ userId }: { userId: any }) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow className="border-b border-zinc-400">
-                <TableCell className="font-medium 2xl:min-w-56">-</TableCell>
-                <TableCell>School</TableCell>
-                <TableCell>
-                  <div className="hidden lg:block">
+              {schoolSurveyIncluded() && (
+                <TableRow className="border-b border-zinc-400">
+                  <TableCell className="font-medium 2xl:min-w-56">-</TableCell>
+                  <TableCell>School</TableCell>
+                  <TableCell>
+                    <div className="hidden lg:block">
+                      {school && school.student_has_survey && school.student_has_survey.length > 0 && school.student_has_survey[0].is_answered ? (
+                        <span className="text-zinc-400">Completed</span>
+                      ) : (
+                        <span className="text-amber-500">Pending</span>
+                      )}
+                    </div>
+                    <div className="block lg:hidden ml-1.5">
+                      {school && school.student_has_survey && school.student_has_survey.length > 0 && school.student_has_survey[0].is_answered ? (
+                        <CheckCircleIcon />
+                      ) : (
+                        <CircleDashed />
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell className="flex justify-end items-center">
                     {school && school.student_has_survey && school.student_has_survey.length > 0 && school.student_has_survey[0].is_answered ? (
-                      <span className="text-zinc-400">Completed</span>
+                      <button disabled className="mr-3">
+                        <ArrowUpRightFromSquare className="stroke-zinc-400 cursor-not-allowed" />
+                      </button>
                     ) : (
-                      <span className="text-amber-500">Pending</span>
+                      <button onClick={() => school && handleSchoolRedirect(school)} className="mr-3">
+                        <ArrowUpRightFromSquare className="stroke-zinc-900" />
+                      </button>
                     )}
-                  </div>
-                  <div className="block lg:hidden ml-1.5">
-                    {school && school.student_has_survey && school.student_has_survey.length > 0 && school.student_has_survey[0].is_answered ? (
-                      <CheckCircleIcon />
-                    ) : (
-                      <CircleDashed />
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell className="flex justify-end items-center">
-                  {/* Check if school and student_has_survey exist and it has at least one item */}
-                  {school && school.student_has_survey && school.student_has_survey.length > 0 && school.student_has_survey[0].is_answered ? (
-                    <button disabled className="mr-3">
-                      <ArrowUpRightFromSquare className="stroke-zinc-400 cursor-not-allowed" />
-                    </button>
-                  ) : (
-                    <button onClick={() => school && handleSchoolRedirect(school)} className="mr-3">
-                      <ArrowUpRightFromSquare className="stroke-zinc-900" />
-                    </button>
-                  )}
-                </TableCell>
+                  </TableCell>
 
-              </TableRow>
+                </TableRow>
+              )}
               {filteredAcademics?.map((item: any, idx: number) => (
                 <TableRow key={idx}>
                   <TableCell className="font-medium 2xl:min-w-56">
