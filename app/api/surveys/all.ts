@@ -8,8 +8,6 @@ export default async function getSurveys(id: string) {
   const academic = await basicFetch<any>(academicEndpoint);
   const school = await basicFetch<any>(schoolEndpoint);
 
-  // console.log(school, academic, 'data in fetch');
-
   return {
     academic,
     school,

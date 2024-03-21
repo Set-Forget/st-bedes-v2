@@ -39,6 +39,8 @@ const SurveyPage = () => {
   const path = useParams();
   const router = useRouter();
   const { data: session, status } = useSession();
+  let studentId: any;
+  if (session) studentId = (session?.user as any).student_id;
 
   useEffect(() => {
     if (status !== "loading") {
@@ -54,7 +56,7 @@ const SurveyPage = () => {
     const storedSubmitId = localStorage.getItem('submitId');
     const storedSchoolId = localStorage.getItem('schoolId');
     console.log(storedSchoolId, storedSubmitId);
-    
+
 
     if (storedSubmitId) setSubmitId(+storedSubmitId);
     if (storedSchoolId) setSchoolId(+storedSchoolId);
@@ -171,8 +173,6 @@ const SurveyPage = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const studentId = (session?.user as any).student_id;
-
     const surveyResponses = Object.entries(selections).map(([questionId, answer]) => ({
       student_id: studentId,
       survey_question_id: parseInt(questionId),

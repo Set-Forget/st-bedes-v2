@@ -14,7 +14,8 @@ import {
 const TeacherSelector = ({ onSelect }: { onSelect: any }) => {
     const { data: session } = useSession()
     const [teachers, setTeachers] = useState<string[]>([])
-    const studentId = (session?.user as any).student_id;
+    let studentId: any;
+    if (session) studentId = (session?.user as any).student_id;
 
     useEffect(() => {
         const fetchData = async () => {
