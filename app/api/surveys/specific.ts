@@ -24,6 +24,12 @@ export async function postAcademicSurveyAnswers(payload: {
     answer: string;
   }[];
 }) {
+  
+  console.log({
+    student_has_survey_teacher: payload.student_has_survey_teacher,
+    CreateSurveyTeacherAnswerDto: payload.CreateSurveyTeacherAnswerDto,
+  });
+  
   const url = process.env.NEXT_PUBLIC_BACK_URL as string;
   const surveyEndpoint = `${url}/survey-teacher/add-answer-teacher`;
   const response = await fetch(surveyEndpoint, {

@@ -30,6 +30,7 @@ interface SurveyQuestion {
 
 const SurveyPage = () => {
   const [survey, setSurvey] = useState<SurveyQuestion[]>([]);
+  const [studentId, setStudentId] = useState(null);
   const { submitId, setSubmitId } = useSurvey();
   const { schoolId, setSchoolId } = useSurvey()
   const [loading, setLoading] = useState(false);
@@ -39,12 +40,10 @@ const SurveyPage = () => {
   const path = useParams();
   const router = useRouter();
   const { data: session, status } = useSession();
-  let studentId: any;
 
   useEffect(() => {
     if (session) {
-      studentId = (session.user as any).student_id;
-      // console.log(studentId, "student id survey page");
+      setStudentId((session.user as any).student_id);
     }
   }, [session]);
 
