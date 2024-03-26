@@ -133,18 +133,6 @@ const SurveyPage = () => {
     setIsSubmitDisabled(!allSelected);
   }, [selections, survey]);
 
-  const checkIfAllRequiredSelected = () => {
-    const allSelected = survey.every(q => {
-      if (q.question.question_type.type !== 'select') {
-        return true;
-      }
-
-      return selections[q.survey_teacher_question_id] !== undefined;
-    });
-
-    setIsSubmitDisabled(!allSelected);
-  };
-
   const renderOptions = (questionId: string | number, options: string | null, question_type: string) => {
     if (question_type === "select" && options) {
       const optionsArray = JSON.parse(options);
